@@ -17,22 +17,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.aplicacion_1.data.addPet
 import com.example.aplicacion_1.model.Pet
+import com.example.aplicacion_1.ui.viewmodel.PetViewModel
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddPetScreen(onPetAdded: () -> Unit) {
+fun AddPetScreen(
+    viewModel: PetViewModel,
+    onPetAdded: () -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var breed by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    val context = LocalContext.current
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -49,7 +51,7 @@ fun AddPetScreen(onPetAdded: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Añadir Nueva Mascota",
+            text = "Añadir Mascota",
             color = Color.White,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
@@ -108,15 +110,13 @@ fun AddPetScreen(onPetAdded: () -> Unit) {
 
         Button(
             onClick = {
-                val newId = (100..1000).random()
                 val newPet = Pet(
-                    id = newId,
                     name = name,
                     age = age,
                     breed = breed,
                     photoUri = selectedImageUri
                 )
-                addPet(newPet)
+                viewModel.addPet(newPet)
                 onPetAdded()
             },
             modifier = Modifier
@@ -125,11 +125,12 @@ fun AddPetScreen(onPetAdded: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD42E2D)),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text("Guardar Mascota", color = Color.White)
+            Text("Guardar", color = Color.White)
         }
     }
 }
 
+// Asegúrate de tener esta función en el mismo archivo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: String) {

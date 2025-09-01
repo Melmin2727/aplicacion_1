@@ -6,17 +6,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.aplicacion_1.data.pets
-import com.example.aplicacion_1.data.addPet
-import com.example.aplicacion_1.data.deletePet
-import com.example.aplicacion_1.data.updatePet
-import com.example.aplicacion_1.model.Pet
+import com.example.aplicacion_1.PetApplication
 import com.example.aplicacion_1.ui.screens.*
+import com.example.aplicacion_1.ui.viewmodel.PetViewModel
+import com.example.aplicacion_1.ui.viewmodel.PetViewModelFactory
 
 // Define las rutas de la aplicación
 object Routes {
@@ -35,8 +35,12 @@ object Routes {
 @Composable
 fun AppNav() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    // Instancia el ViewModel para que esté disponible en toda la navegación
+    val petViewModel: PetViewModel = viewModel(
+        factory = PetViewModelFactory((context.applicationContext as PetApplication).repository)
+    )
 
-    // El BottomNav se mostrará solo en las pantallas principales
     val showBottomBar = navController
         .currentBackStackEntryFlow
         .collectAsState(initial = navController.currentBackStackEntry)
@@ -87,7 +91,9 @@ fun AppNav() {
                 AppointmentScreen()
             }
             composable(Routes.PET_LIST_SCREEN) {
+                // Pasa el viewModel a la pantalla
                 PetListScreen(
+                    viewModel = petViewModel,
                     onAddPetClicked = { navController.navigate(Routes.ADD_PET_SCREEN) },
                     onPetClicked = { pet ->
                         navController.navigate("pet_profile_screen/${pet.id}")
@@ -96,12 +102,14 @@ fun AppNav() {
                         navController.navigate("edit_pet_screen/${pet.id}")
                     },
                     onDeleteClicked = { pet ->
-                        deletePet(pet.id)
+                        petViewModel.deletePet(pet)
                     }
                 )
             }
             composable(Routes.ADD_PET_SCREEN) {
+                // Pasa el viewModel a la pantalla
                 AddPetScreen(
+                    viewModel = petViewModel,
                     onPetAdded = { navController.popBackStack() }
                 )
             }
@@ -110,7 +118,9 @@ fun AppNav() {
                 arguments = listOf(navArgument("petId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val petId = backStackEntry.arguments?.getInt("petId")
-                val selectedPet = pets.find { it.id == petId }
+                // Usa el ViewModel para obtener la lista de mascotas y encontrar la correcta
+                val allPets by petViewModel.allPets.collectAsState(initial = emptyList())
+                val selectedPet = allPets.find { it.id == petId }
 
                 if (selectedPet != null) {
                     PetProfileScreen(
@@ -126,16 +136,19 @@ fun AppNav() {
                 arguments = listOf(navArgument("petId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val petId = backStackEntry.arguments?.getInt("petId")
-                val pet = pets.find { it.id == petId }
+                // Usa el ViewModel para obtener la lista de mascotas y encontrar la correcta
+                val allPets by petViewModel.allPets.collectAsState(initial = emptyList())
+                val pet = allPets.find { it.id == petId }
+
                 if (pet != null) {
                     EditPetScreen(
                         pet = pet,
                         onPetUpdated = { updatedPet ->
-                            updatePet(updatedPet)
+                            petViewModel.updatePet(updatedPet)
                             navController.popBackStack()
                         },
                         onPetDeleted = {
-                            deletePet(pet.id)
+                            petViewModel.deletePet(pet)
                             navController.popBackStack()
                         }
                     )
