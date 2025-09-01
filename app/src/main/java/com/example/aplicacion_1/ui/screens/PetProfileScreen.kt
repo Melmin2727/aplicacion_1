@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pets // <-- Importación correcta
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -54,14 +54,13 @@ fun PetProfileScreen(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            // Aquí falta el botón de editar
             Image(
-                painter = painterResource(id = R.drawable.perro), // Asegúrate de tener este recurso
+                painter = painterResource(id = R.drawable.perro), // <-- Ícono de edición
                 contentDescription = "Ícono de edición",
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .clickable { onEditClicked(pet) } // Agrega el click
+                    .clickable { onEditClicked(pet) } // <-- Llama a la función de editar
             )
         }
         Column(

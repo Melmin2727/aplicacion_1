@@ -3,6 +3,8 @@ package com.example.aplicacion_1.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -10,21 +12,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.aplicacion_1.data.pets
+import com.example.aplicacion_1.data.addPet
+import com.example.aplicacion_1.data.deletePet
+import com.example.aplicacion_1.data.updatePet
 import com.example.aplicacion_1.model.Pet
-import com.example.aplicacion_1.ui.screens.AddPetScreen
-import com.example.aplicacion_1.ui.screens.AppointmentScreen
-import com.example.aplicacion_1.ui.screens.EditPetScreen
-import com.example.aplicacion_1.ui.screens.HomeScreen
-import com.example.aplicacion_1.ui.screens.PetListScreen
-import com.example.aplicacion_1.ui.screens.PetProfileScreen
-import com.example.aplicacion_1.ui.screens.SplashScreen
-import com.example.aplicacion_1.ui.screens.LoginScreen // Importación de la nueva pantalla
-import androidx.compose.runtime.collectAsState
+import com.example.aplicacion_1.ui.screens.*
+
 // Define las rutas de la aplicación
 object Routes {
     const val BOTTOM_NAV = "bottom_nav"
-    const val SPLASH_SCREEN = "splash_screen" // Nueva ruta
-    const val LOGIN_SCREEN = "login_screen" // Nueva ruta
+    const val SPLASH_SCREEN = "splash_screen"
+    const val LOGIN_SCREEN = "login_screen"
     const val HOME_SCREEN = "home_screen"
     const val APPOINTMENT_SCREEN = "appointment_screen"
     const val PET_LIST_SCREEN = "pet_list_screen"
@@ -58,7 +56,7 @@ fun AppNav() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.SPLASH_SCREEN, // La app ahora inicia con el SplashScreen
+            startDestination = Routes.SPLASH_SCREEN,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Routes.SPLASH_SCREEN) {
@@ -93,6 +91,12 @@ fun AppNav() {
                     onAddPetClicked = { navController.navigate(Routes.ADD_PET_SCREEN) },
                     onPetClicked = { pet ->
                         navController.navigate("pet_profile_screen/${pet.id}")
+                    },
+                    onEditClicked = { pet ->
+                        navController.navigate("edit_pet_screen/${pet.id}")
+                    },
+                    onDeleteClicked = { pet ->
+                        deletePet(pet.id)
                     }
                 )
             }
@@ -107,11 +111,12 @@ fun AppNav() {
             ) { backStackEntry ->
                 val petId = backStackEntry.arguments?.getInt("petId")
                 val selectedPet = pets.find { it.id == petId }
+
                 if (selectedPet != null) {
                     PetProfileScreen(
                         pet = selectedPet,
-                        onEditClicked = {
-                            navController.navigate("edit_pet_screen/${selectedPet.id}")
+                        onEditClicked = { petToEdit ->
+                            navController.navigate("edit_pet_screen/${petToEdit.id}")
                         }
                     )
                 }
@@ -125,9 +130,12 @@ fun AppNav() {
                 if (pet != null) {
                     EditPetScreen(
                         pet = pet,
-                        onPetUpdated = { navController.popBackStack() },
-                        onPetDeleted = {
+                        onPetUpdated = { updatedPet ->
+                            updatePet(updatedPet)
                             navController.popBackStack()
+                        },
+                        onPetDeleted = {
+                            deletePet(pet.id)
                             navController.popBackStack()
                         }
                     )
@@ -136,7 +144,7 @@ fun AppNav() {
                 }
             }
             composable(Routes.PROFILE_SCREEN) {
-                // Aquí irá la pantalla de perfil de usuario con los datos de registro
+                UserProfileScreen()
             }
         }
     }

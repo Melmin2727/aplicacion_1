@@ -140,9 +140,9 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
-        colors = TextFieldDefaults.colors( // <-- ¡Línea corregida!
-            focusedContainerColor = Color(0xFF262626), // Añade color para el estado de foco
-            unfocusedContainerColor = Color(0xFF262626), // Añade color para el estado sin foco
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color(0xFF262626),
+            unfocusedContainerColor = Color(0xFF262626),
             disabledContainerColor = Color(0xFF262626),
             cursorColor = Color.White,
             focusedTextColor = Color.White,

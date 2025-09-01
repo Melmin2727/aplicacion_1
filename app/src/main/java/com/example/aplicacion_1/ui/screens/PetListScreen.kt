@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -28,7 +30,9 @@ import com.example.aplicacion_1.model.Pet
 @Composable
 fun PetListScreen(
     onAddPetClicked: () -> Unit,
-    onPetClicked: (Pet) -> Unit
+    onPetClicked: (Pet) -> Unit,
+    onEditClicked: (Pet) -> Unit, // <-- Agregado para la acción de editar
+    onDeleteClicked: (Pet) -> Unit // <-- Agregado para la acción de eliminar
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -50,7 +54,12 @@ fun PetListScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(pets) { pet ->
-                    PetCard(pet = pet, onPetClicked = onPetClicked)
+                    PetCard(
+                        pet = pet,
+                        onPetClicked = onPetClicked,
+                        onEditClicked = onEditClicked,
+                        onDeleteClicked = onDeleteClicked
+                    )
                 }
             }
         }
@@ -68,40 +77,74 @@ fun PetListScreen(
 }
 
 @Composable
-fun PetCard(pet: Pet, onPetClicked: (Pet) -> Unit) {
+fun PetCard(
+    pet: Pet,
+    onPetClicked: (Pet) -> Unit,
+    onEditClicked: (Pet) -> Unit,
+    onDeleteClicked: (Pet) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFF262626))
-            .clickable { onPetClicked(pet) }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (pet.photoUri != null) {
-            Image(
-                painter = rememberAsyncImagePainter(pet.photoUri),
-                contentDescription = "Foto de ${pet.name}",
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Pets, contentDescription = "Sin foto", tint = Color.White)
+        // La información de la mascota
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .clickable { onPetClicked(pet) },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (pet.photoUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(pet.photoUri),
+                    contentDescription = "Foto de ${pet.name}",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Gray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Pets, contentDescription = "Sin foto", tint = Color.White)
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = pet.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(text = "${pet.age} • ${pet.breed}", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
             }
         }
+
+        // Los botones de editar y eliminar
         Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Text(text = pet.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(text = "${pet.age} • ${pet.breed}", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { onEditClicked(pet) }) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Editar mascota",
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = { onDeleteClicked(pet) }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Eliminar mascota",
+                    tint = Color.Red
+                )
+            }
         }
     }
 }
