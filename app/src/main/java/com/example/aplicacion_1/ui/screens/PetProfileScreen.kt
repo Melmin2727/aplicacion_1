@@ -6,9 +6,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.aplicacion_1.R
 import com.example.aplicacion_1.model.Pet
 
@@ -31,7 +32,6 @@ fun PetProfileScreen(
             .fillMaxSize()
             .background(Color(0xFF4B3322))
     ) {
-        // Top Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -53,14 +53,13 @@ fun PetProfileScreen(
                 fontWeight = FontWeight.Bold
             )
             Image(
-                painter = painterResource(id = R.drawable.agendar_cita),
+                painter = painterResource(id = R.drawable.perro),
                 contentDescription = "Ícono de edición",
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
             )
         }
-        // Pet Info
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,24 +69,36 @@ fun PetProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = pet.photo), // Usa la foto de la mascota
-                    contentDescription = "Foto de perfil de ${pet.name}",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .border(1.dp, Color.White, RoundedCornerShape(16.dp))
-                )
+                if (pet.photoUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(pet.photoUri),
+                        contentDescription = "Foto de perfil de ${pet.name}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(1.dp, Color.White, RoundedCornerShape(16.dp))
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.Gray)
+                            .border(1.dp, Color.White, RoundedCornerShape(16.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Pets, contentDescription = "Sin foto", tint = Color.White, modifier = Modifier.size(60.dp))
+                    }
+                }
                 Column(
                     modifier = Modifier.padding(start = 16.dp)
                 ) {
-                    Text(text = pet.name, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold) // Usa el nombre de la mascota
-                    Text(text = "${pet.age} • ${pet.breed}", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp) // Usa edad y raza
+                    Text(text = pet.name, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "${pet.age} • ${pet.breed}", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
                 }
             }
         }
-        // Info Cards
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -96,7 +107,7 @@ fun PetProfileScreen(
                 InfoRow(label = "Nombre", value = pet.name)
                 InfoRow(label = "Edad", value = pet.age)
                 InfoRow(label = "Raza", value = pet.breed)
-                InfoRow(label = "Peso", value = "24 kg") // Puedes mantener un valor estático por ahora
+                InfoRow(label = "Peso", value = "24 kg")
             }
             InfoCard(title = "Vacunas") {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -126,21 +137,6 @@ fun PetProfileScreen(
 }
 
 @Composable
-fun HistoryItem(title: String, date: String, location: String) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun VaccineButton(text: String) {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun InfoRow(label: String, value: String) {
-    TODO("Not yet implemented")
-}
-
-@Composable
 fun InfoCard(title: String, content: @Composable () -> Unit) {
     Box(
         modifier = Modifier
@@ -152,7 +148,48 @@ fun InfoCard(title: String, content: @Composable () -> Unit) {
         Column {
             Text(text = title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
-            content() // Llama a la función que contiene los composables
+            content()
+        }
+    }
+}
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.White, fontSize = 14.sp)
+        Text(text = value, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun VaccineButton(text: String) {
+    Button(
+        onClick = { /* Lógica */ },
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF785B46)),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Text(text, color = Color.White, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun HistoryItem(title: String, date: String, location: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(Color.Red)
+        )
+        Column(modifier = Modifier.padding(start = 8.dp)) {
+            Text(text = title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(text = "$date • $location", color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
         }
     }
 }

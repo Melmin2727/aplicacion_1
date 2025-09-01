@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.example.aplicacion_1.data.pets
 import com.example.aplicacion_1.model.Pet
 
@@ -44,7 +45,6 @@ fun PetListScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Lista de mascotas
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -54,7 +54,6 @@ fun PetListScreen(
                 }
             }
         }
-        // Botón flotante para agregar mascota
         FloatingActionButton(
             onClick = onAddPetClicked,
             modifier = Modifier
@@ -79,14 +78,26 @@ fun PetCard(pet: Pet, onPetClicked: (Pet) -> Unit) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = pet.photo),
-            contentDescription = "Foto de ${pet.name}",
-            modifier = Modifier
-                .size(60.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
+        if (pet.photoUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(pet.photoUri),
+                contentDescription = "Foto de ${pet.name}",
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.Gray),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Pets, contentDescription = "Sin foto", tint = Color.White)
+            }
+        }
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(text = pet.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
