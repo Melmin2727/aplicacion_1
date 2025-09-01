@@ -21,3 +21,14 @@ val pets: SnapshotStateList<Pet> = mutableStateListOf(
 fun addPet(newPet: Pet) {
     pets.add(newPet)
 }
+
+fun updatePet(updatedPet: Pet) {
+    val index = pets.indexOfFirst { it.id == updatedPet.id }
+    if (index != -1) {
+        pets[index] = updatedPet
+    }
+}
+
+fun deletePet(petId: Int) {
+    pets.removeIf { it.id == petId }
+}

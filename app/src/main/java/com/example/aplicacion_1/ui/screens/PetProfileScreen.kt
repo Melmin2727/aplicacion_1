@@ -3,11 +3,12 @@ package com.example.aplicacion_1.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Pets // <-- Importación correcta
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +26,8 @@ import com.example.aplicacion_1.model.Pet
 
 @Composable
 fun PetProfileScreen(
-    pet: Pet
+    pet: Pet,
+    onEditClicked: (Pet) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -52,12 +54,14 @@ fun PetProfileScreen(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
+            // Aquí falta el botón de editar
             Image(
-                painter = painterResource(id = R.drawable.perro),
+                painter = painterResource(id = R.drawable.perro), // Asegúrate de tener este recurso
                 contentDescription = "Ícono de edición",
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
+                    .clickable { onEditClicked(pet) } // Agrega el click
             )
         }
         Column(
